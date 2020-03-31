@@ -8,3 +8,15 @@
   display: flex;
   justify-content: center;
 }
+.newmovieimg {
+  margin-bottom: 1rem;
+  img {
+    width: 150px;
+    height: 150px;
+    border-radius: 10px;
+    object-fit: cover;
+  }
+}
+.errormessage {
+  color: red;
+}
