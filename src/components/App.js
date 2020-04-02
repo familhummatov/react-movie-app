@@ -13,7 +13,8 @@ export default class App extends Component {
         <Header />
         <Container text>
           <Route path="/movies" component={MoviesPage} exact />
-          <Route path="/movies/newmovie" component={NewMoviePage} exact />
+          <Route path="/movies/newmovie" component={NewMoviePage} />
+          <Route path="/movie/:_id" component={NewMoviePage} />
         </Container>
         <Footer />
       </div>

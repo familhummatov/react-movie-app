@@ -4,7 +4,7 @@ import {
   FETCH_MOVIES_PENDING
 } from "../actions/movies";
 const initialState = {
-  movies: [],
+  movieList: [],
   error: {},
   fetching: false
 };
@@ -18,7 +18,7 @@ export default (state = initialState, action) => {
     case FETCH_MOVIES_FULFILLED:
       return {
         ...state,
-        movies: action.payload,
+        movieList: action.payload,
         fetching: false
       };
     case FETCH_MOVIES_REJECTED:

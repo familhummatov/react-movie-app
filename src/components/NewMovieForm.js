@@ -1,15 +1,17 @@
 import React, { Component } from "react";
-import { Button, Form, Image } from "semantic-ui-react";
+import { Button, Form, Image, Message } from "semantic-ui-react";
 import InlineError from "./InlineError";
+import PropTypes from "prop-types";
+import { Redirect } from "react-router-dom";
 export default class NewMovieForm extends Component {
   state = {
-    title: "",
-    cover: "",
+    title: this.props.movie ? this.props.movie.title : "",
+    cover: this.props.movie ? this.props.movie.cover : "",
     error: {}
   };
   handleChange = e => {
     this.setState({
-      [e.target.name]: e.target.value.trim()
+      [e.target.name]: e.target.value
     });
   };
   handleSubmit = () => {
@@ -17,6 +19,10 @@ export default class NewMovieForm extends Component {
     this.setState({
       error
     });
+
+    if (Object.keys(error).length === 0) {
+      this.props.newMovieOnSubmit(this.state);
+    }
   };
   validate = () => {
     const error = {};
@@ -24,41 +30,62 @@ export default class NewMovieForm extends Component {
     if (!this.state.cover) error.cover = "Please enter cover url";
     return error;
   };
+  static propTypes = {
+    newMovieOnSubmit: PropTypes.func.isRequired
+  };
+  componentWillReceiveProps(nextProps) {
+    const { movie } = nextProps.newMovie;
+    if (movie.title && movie.title !== this.state.title) {
+      this.setState({
+        title: movie.title,
+        cover: movie.cover
+      });
+    }
+  }
   render() {
     const { error } = this.state;
+    const form = (
+      <Form loading={this.props.newMovie.fetching} onSubmit={this.handleSubmit}>
+        <Form.Field error={!!error.title}>
+          <label>Movie Title</label>
+          {error.title && <InlineError message={error.title} />}
+          <input
+            id="title"
+            name="title"
+            value={this.state.title}
+            onChange={this.handleChange}
+            placeholder="Movie Title"
+          />
+        </Form.Field>
+        <Form.Field error={!!error.cover}>
+          <label>Cover URL</label>
+          {error.cover && <InlineError message={error.cover} />}
+          <input
+            id="cover"
+            name="cover"
+            value={this.state.cover}
+            onChange={this.handleChange}
+            placeholder="Cover URL"
+          />
+        </Form.Field>
+        <div className="newmovieimg">
+          <Image src={this.state.cover} size="small" />
+        </div>
+        <Button primary type="submit">
+          Add
+        </Button>
+        {this.props.newMovie.error.response && (
+          <Message negative>
+            <Message.Header>
+              We're sorry we can't apply that discount
+            </Message.Header>
+            <p>That offer has expired</p>
+          </Message>
+        )}
+      </Form>
+    );
     return (
-      <div>
-        <Form onSubmit={this.handleSubmit}>
-          <Form.Field>
-            <label>Movie Title</label>
-            {error.title && <InlineError message={error.title} />}
-            <input
-              id="title"
-              name="title"
-              value={this.state.title}
-              onChange={this.handleChange}
-              placeholder="Movie Title"
-            />
-          </Form.Field>
-          <Form.Field>
-            <label>Cover URL</label>
-            {error.cover && <InlineError message={error.cover} />}
-            <input
-              id="cover"
-              name="cover"
-              value={this.state.cover}
-              onChange={this.handleChange}
-              placeholder="Cover URL"
-            />
-          </Form.Field>
-          <div className="newmovieimg">
-            <Image src={this.state.cover} size="small" />
-          </div>
-          <Button primary type="submit">
-            Add
-          </Button>
-        </Form>
-      </div>
+      <div>{this.props.newMovie.done ? <Redirect to="/movies" /> : form}</div>
     );
   }
 }
