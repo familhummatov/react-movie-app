@@ -1,1 +1,1 @@
-export const API_BASE = "http://localhost:8080/api";
+export const API_BASE = "https://react-movie-app-1996.appspot.com/api";

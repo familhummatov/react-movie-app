@@ -5,23 +5,30 @@ import PropTypes from "prop-types";
 import { Redirect } from "react-router-dom";
 export default class NewMovieForm extends Component {
   state = {
+    _id: this.props.movie ? this.props.movie._id : "",
     title: this.props.movie ? this.props.movie.title : "",
     cover: this.props.movie ? this.props.movie.cover : "",
-    error: {}
+    error: {},
+    redirect: false,
   };
-  handleChange = e => {
+  handleChange = (e) => {
     this.setState({
-      [e.target.name]: e.target.value
+      [e.target.name]: e.target.value,
     });
   };
   handleSubmit = () => {
     const error = this.validate();
     this.setState({
-      error
+      error,
+      redirect: true,
     });
-
+    const _id = this.state._id || this.props.newMovie.movie._id;
     if (Object.keys(error).length === 0) {
-      this.props.newMovieOnSubmit(this.state);
+      if (!_id) {
+        this.props.newMovieOnSubmit(this.state);
+      } else {
+        this.props.newMovieOnUpdate({ ...this.state, _id });
+      }
     }
   };
   validate = () => {
@@ -31,21 +38,26 @@ export default class NewMovieForm extends Component {
     return error;
   };
   static propTypes = {
-    newMovieOnSubmit: PropTypes.func.isRequired
+    newMovieOnSubmit: PropTypes.func.isRequired,
   };
   componentWillReceiveProps(nextProps) {
     const { movie } = nextProps.newMovie;
     if (movie.title && movie.title !== this.state.title) {
       this.setState({
         title: movie.title,
-        cover: movie.cover
+        cover: movie.cover,
       });
     }
   }
   render() {
     const { error } = this.state;
     const form = (
-      <Form loading={this.props.newMovie.fetching} onSubmit={this.handleSubmit}>
+      <Form
+        loading={
+          this.props.newMovie.fetching || this.props.newMovie.movie.fetching
+        }
+        onSubmit={this.handleSubmit}
+      >
         <Form.Field error={!!error.title}>
           <label>Movie Title</label>
           {error.title && <InlineError message={error.title} />}
@@ -85,7 +97,13 @@ export default class NewMovieForm extends Component {
       </Form>
     );
     return (
-      <div>{this.props.newMovie.done ? <Redirect to="/movies" /> : form}</div>
+      <div>
+        {this.props.newMovie.done && this.state.redirect ? (
+          <Redirect to="/movies" />
+        ) : (
+          form
+        )}
+      </div>
     );
   }
 }

@@ -3,7 +3,7 @@ import PropTypes from "prop-types";
 import MovieItem from "./MovieItem";
 import { Grid } from "semantic-ui-react";
 import { HashLoader } from "react-spinners";
-const MoviesList = ({ movies }) => {
+const MoviesList = ({ movies, deleteMovie }) => {
   const emptyMessage = <p>Movies List is empty</p>;
   const moviesList = (
     <div>
@@ -15,8 +15,12 @@ const MoviesList = ({ movies }) => {
         <h3>Error retireving data!</h3>
       ) : (
         <Grid stackable columns={3}>
-          {movies.movieList.map(movie => (
-            <MovieItem key={movie._id} movie={movie} />
+          {movies.movieList.map((movie) => (
+            <MovieItem
+              deleteMovie={deleteMovie}
+              key={movie._id}
+              movie={movie}
+            />
           ))}
         </Grid>
       )}
@@ -27,8 +31,8 @@ const MoviesList = ({ movies }) => {
 
 MoviesList.propTypes = {
   movies: PropTypes.shape({
-    movieList: PropTypes.array.isRequired
-  }).isRequired
+    movieList: PropTypes.array.isRequired,
+  }).isRequired,
 };
 
 export default MoviesList;
